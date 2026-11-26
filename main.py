@@ -9,12 +9,12 @@ from datetime import datetime, timezone, timedelta
 import requests
 
 ANGLES = [
-    "Tips & Kebiasaan Harian: buka dengan hook jumlah tips/kebiasaan (mis. 'Cuma X kebiasaan ini...') lalu bagikan langkah praktis sebelum mengenalkan produk.",
-    "Fase Masalah Pembaca: buka dengan pertanyaan reflektif ('Lo sekarang lagi di fase mana?') + 3 bullet poin keluhan nyata, lalu beri solusi bertahap.",
-    "Pengalaman Pribadi / Storytelling: cerita singkat dari sudut pandang orang yang pernah mengalami atau berhasil melewati masalahnya tanpa cara aneh.",
-    "Kesalahan Umum & Trik Cepat: bahas hal yang sering bikin orang stuck atau salah langkah, kasih trik simpelnya, baru kenalkan produk sebagai alat bantu.",
-    "Perbandingan Sebelum-Sesudah: ceritakan perubahan pola belajar/kebiasaan dari yang ribet jadi lebih terarah berkat sistem + produk ini.",
-    "Review Jujur + Catatan Realistis: fokus ke alasan kenapa produk ini kepakai banget, plus kekurangan/catatan jujur supaya pembaca percaya.",
+    "One-Shot / Kebiasaan Harian: buka dengan hook kredibel 'Tips [tujuan] dari yang pernah...' + 'Gue nggak pakai cara aneh. Cuma X kebiasaan ini...' + urgensi mulai sekarang.",
+    "Pola Simpel Anti-Ribet: buka dengan hook 'Cara [tujuan] tanpa ribet...' + patahkan mitos harus belajar/kerja keras tanpa arah + X langkah simpel tiap hari.",
+    "Ubah Nilai/Hasil yang Mentok: buka dengan hook 'Yang bikin hasil gue/orang naik dari mentok jadi tembus...' + X perubahan kecil yang dijalanin konsisten.",
+    "Trik Hemat Waktu: buka dengan hook 'Jangan buang waktu lagi, cukup X trik ini buat...' + cerita kenapa trik kecil lebih ngaruh daripada teori numpuk.",
+    "Persiapan dari Nol: buka dengan hook 'Kalau mulai dari nol buat [tujuan], gue bakal lakuin X hal ini dulu...' + langkah harian yang realistis dijalani.",
+    "Pengalaman Pribadi + Sistem Rapi: buka dengan hook 'Dulu gue juga keteteran, sampai akhirnya nemu X cara ini...' + sistem harian yang bikin progres kerasa.",
 ]
 
 THREADS_API_BASE = "https://graph.threads.net/v1.0"
@@ -117,39 +117,39 @@ def generate_thread_posts(
     if kekurangan:
         extra_info += f"- Kekurangan / Catatan Jujur: {kekurangan}\n"
 
-    prompt = f"""Kamu adalah kreator Threads Indonesia yang gaya penulisannya santai, jujur, padat, to the point, pakai sapaan "gue" dan "lo" (bukan bahasa iklan kaku atau clickbait lebay), dan selalu memberi value/tips berguna dulu sebelum menyebut produk.
+    prompt = f"""Kamu adalah kreator Threads Indonesia yang gaya penulisannya santai, jujur, padat, membumi, pakai sapaan "gue" dan "lo" (bukan bahasa iklan kaku, bukan gaya motivator klise), dan selalu memberi value/tips berguna dulu sebelum menyebut produk.
 
-CONTOH GAYA & ALUR UTAS YANG DIINGINKAN (ikuti gaya bahasa, ritme paragraf pendek, kejujuran, dan struktur 8 bagian ini, tapi sesuaikan topiknya dengan produk di bawah):
-- Utas 1 (Hook kuat + konteks):
+CONTOH GAYA, EMOJI, SPASI BARIS, & ALUR UTAS YANG DIINGINKAN (ikuti persis ritme paragraf pendek dengan baris kosong, kekuatan hook, dan penempatan emoji seperti ini, tapi sesuaikan topiknya dengan produk di bawah):
+- Utas 1 (Hook kuat — WAJIB 3 paragraf pendek dipisah baris kosong):
   Tips lolos CPNS dari yang pernah one shot 🙏
 
   Gue nggak belajar pakai cara aneh. Cuma 6 kebiasaan ini, dijalanin tiap hari sampai hari H.
 
   CPNS 2026 dibuka November, jadi mulai dari sekarang.
-- Utas 2 (Relatable check + 3 bullet "•"):
-  Lo sekarang lagi di fase mana?
+- Utas 2 (Relatable check + 3 bullet "•" berupa kondisi nyata, bukan pertanyaan):
+  Lo sekarang lagi di fase mana? 🤔
 
   • Niat belajar, tapi gampang kegoda main
   • Udah baca banyak materi, tapi lupa lagi
   • Udah latihan soal, tapi nilainya mentok
 
-  Kalau salah satunya, 6 tips ini buat lo.
-- Utas 3 (Tip/Value 1):
-  Tip 1: Kurangin keluar main.
+  Kalau salah satunya, 6 tips ini buat lo 👇
+- Utas 3 (Tip/Value 1 + 1 emoji relevan + baris kosong):
+  📌 Tip 1: Kurangin keluar main.
   Bukan berarti nggak boleh sama sekali. Sesekali boleh, tapi kalau nggak penting, tahan dulu.
 
   Waktu belajar lo sempit, jadi jaga baik-baik.
-- Utas 4 (Tip/Value 2-3):
-  Tip 2 & 3: Rangkum pakai tulisan tangan.
+- Utas 4 (Tip/Value 2-3 + 1 emoji relevan + baris kosong):
+  ✍️ Tip 2 & 3: Rangkum pakai tulisan tangan.
   Baca dari buku, ebook, atau YouTube, lalu rangkum di satu buku khusus.
 
   Pakai bahasa semudah mungkin supaya gampang diingat. Kalau bahasanya masih ribet, berarti lo belum paham.
-- Utas 5 (Tip/Value 4-5):
-  Tip 4 & 5: Latihan soal dan materi baru tiap hari.
+- Utas 5 (Tip/Value 4-5 + 1 emoji relevan + baris kosong):
+  ⚡ Tip 4 & 5: Latihan soal dan materi baru tiap hari.
   Banyakin latihan soal. Setiap soal baru yang lo tahu, wajib dicatat di buku tadi.
 
   Tiap hari juga harus ada minimal 1 materi baru yang belum pernah lo pelajari.
-- Utas 6 (Kenalkan produk secara natural + alasan pakai + kekurangan jujur):
+- Utas 6 (Kenalkan produk + emoji ikon produk + alasan pakai + kekurangan jujur):
   Soal sumber belajar, gue dulu cuma pakai 2 buku:
 
   📘 [SANG TUTOR] untuk TIU
@@ -158,43 +158,58 @@ CONTOH GAYA & ALUR UTAS YANG DIINGINKAN (ikuti gaya bahasa, ritme paragraf pende
   Alasannya: kita nggak butuh teori ribet, cuma butuh trik kecil buat dapat waktu pengerjaan tercepat.
   Kekurangannya: tetap harus luangin waktu buat paham konsep dasarnya.
 - Utas 7 (Link produk + soft CTA tanpa memaksa):
-  Ini link bukunya:
+  Ini link bukunya 👇
   https://example.com/produk
 
   Kalau udah punya yang serupa, pakai aja. Yang penting mulai sekarang, bukan nunggu nanti.
-- Utas 8 (Closing interaksi + penyemangat, TANPA link):
+- Utas 8 (Closing interaksi + penyemangat + emoji, TANPA link):
   Kalau ada yang mau ditanyain soal cara atur jadwal atau latihan soal, tanya di komen. Gue jawab satu-satu.
 
   Semangat, semoga lo yang berhasil tahun ini 🤞
 
 TUGAS SEKARANG:
-Buatkan 1 utas baru yang terdiri dari **7 sampai 8 postingan berantai** untuk produk berikut:
+Buatkan 1 utas baru yang terdiri dari **8 postingan berantai** untuk produk berikut:
 - Nama Produk: {produk}
 - Keunggulan / Info Produk: {keunggulan}
 {extra_info}- Link Produk (wajib masuk persis di Utas ke-7 / postingan kedua terakhir):
 {links_display}
 - Angle variasi kali ini: {angle}
 
-Aturan ketat:
-1. Gunakan gaya "gue / lo", kalimat pendek-pendek, paragraf ringkas (1-3 kalimat per paragraf), terasa seperti sharing pengalaman nyata, BUKAN tulisan robot/iklan.
-2. Utas 1–5 fokus memberi tips, kebiasaan, atau insight nyata yang relevan dengan produk (JANGAN sebut link atau jualan di Utas 1–5). Di Utas 2, gunakan format pertanyaan + 3 bullet "•".
-3. Utas kedua terakhir (sebelum link): baru sebut produk sebagai alat bantu/rekomendasi pribadi, sertakan **Alasannya** dan **Kekurangannya** secara jujur & realistis.
-4. Utas sebelum terakhir (posisi ke-2 dari belakang): khusus taruh pengantar singkat + seluruh Link Produk persis seperti aslinya + kalimat soft-selling santai (misal kalau sudah punya/ada alternatif, pakai aja).
-5. Utas TERAKHIR: wajib murni closing interaksi (ajak pembaca tanya/diskusi di kolom komentar, "gue jawab satu-satu" atau sejenisnya) + kalimat penyemangat + 1 emoji natural. JANGAN taruh link di utas terakhir.
-6. JANGAN beri nomor urut di awal tiap postingan (jangan tulis "1.", "2.", "3." di awal kartu) dan JANGAN pakai hashtag (#).
-7. Setiap postingan MAKSIMAL 450 karakter (termasuk spasi, baris baru, dan link).
+Aturan ketat (WAJIB DIPATUHI):
+1. **HOOK UTAS 1 HARUS NENDANG:**
+   - DILARANG membuka dengan kalimat klise/menggurui seperti "Sering banget lihat orang gagal...", "Banyak orang...", atau "Tahukah kamu...".
+   - Baris 1 WAJIB berupa judul hook singkat + kredibilitas/janji hasil + **1 emoji** di akhir baris (pilih: 🙏, 🔥, 📌, 💡).
+   - Paragraf 2 WAJIB mematahkan cara ribet + menyebut angka konkret (misal: "Gue nggak pakai cara aneh. Cuma 5 kebiasaan/langkah ini...").
+   - Paragraf 3 WAJIB 1 kalimat urgensi kenapa harus mulai sekarang.
+   - Pisahkan ke-3 paragraf itu dengan baris kosong (`\\n\\n`).
+2. **EMOJI HARUS TERASA HIDUP (TAPI NATURAL):**
+   - Utas 1: wajib 1 emoji di akhir judul baris pertama.
+   - Utas 2: wajib 1 emoji di kalimat pembuka/penutup (`🤔`, `👇`).
+   - Utas 3–5: setiap postingan WAJIB punya **1–2 emoji relevan** di awal judul tip atau di akhir paragraf (misal `📌`, `✍️`, `⚡`, `🎯`, `🧠`, `⏰`).
+   - Utas 6: wajib pakai emoji ikon di depan nama produk (misal `📊`, `📘`, `💻`, `✅`) + tulis jelas `Alasannya:` dan `Kekurangannya:`.
+   - Utas 7: wajib 1 emoji penunjuk di baris pengantar link (`👇`) + Link Produk persis aslinya + soft-selling santai.
+   - Utas 8: wajib 1 emoji penyemangat di akhir (`🤞`, `💪`, `🙏`).
+3. **UTAS 2 (FASE MASALAH):**
+   - Buka dengan pertanyaan singkat (`Lo sekarang lagi di fase mana?` atau sejenisnya), lalu 3 bullet `•` berisi **kondisi nyata** (bukan kalimat tanya semua), lalu 1 kalimat pengantar masuk ke tips.
+4. **UTAS 3–5 (TIPS KONKRET):**
+   - Pakai label seperti `Tip 1:`, `Tip 2 & 3:`, `Tip 4 & 5:` (atau `Langkah 1:`, dst.) yang konsisten dengan angka di Hook Utas 1!
+   - Gunakan paragraf pendek dipisah baris kosong (`\\n\\n`), bahasa ngobrol nyata, JANGAN pakai kalimat klise/robot.
+5. **UTAS 8 (TERAKHIR):**
+   - Murni ajakan tanya/diskusi di kolom komentar ("tanya di komen. Gue jawab satu-satu.") + penyemangat. JANGAN taruh link di utas ke-8.
+6. JANGAN beri nomor kartu di awal postingan ("1.", "2.", "3.") dan JANGAN pakai hashtag (#).
+7. Setiap postingan MAKSIMAL 450 karakter (termasuk spasi, baris baru, emoji, dan link).
 
 Kembalikan HANYA JSON valid dengan format:
 {{
   "posts": [
-    "isi utas 1 (hook)",
-    "isi utas 2 (fase masalah dengan bullet)",
-    "isi utas 3 (tip/value)",
-    "isi utas 4 (tip/value)",
-    "isi utas 5 (tip/value)",
-    "isi utas 6 (produk + alasan + kekurangan)",
-    "isi utas 7 (link produk + soft CTA)",
-    "isi utas 8 (ajakan komen + semangat, tanpa link)"
+    "isi utas 1 (hook 3 paragraf + emoji)",
+    "isi utas 2 (fase masalah 3 bullet + emoji)",
+    "isi utas 3 (tip/value + emoji)",
+    "isi utas 4 (tip/value + emoji)",
+    "isi utas 5 (tip/value + emoji)",
+    "isi utas 6 (produk berikon emoji + alasan + kekurangan)",
+    "isi utas 7 (pengantar emoji + link produk + soft CTA)",
+    "isi utas 8 (ajakan komen + semangat + emoji, tanpa link)"
   ]
 }}"""
 
