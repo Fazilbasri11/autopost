@@ -117,6 +117,7 @@ def generate_thread_posts(
     kekurangan = str(product.get("Kekurangan", "")).strip()
     niche = str(product.get("Niche", "") or product.get("Topik", "")).strip()
     manual_topic = sanitize_topic_tag(str(product.get("Topic", "") or product.get("Topic_Tag", "")))
+    current_year = datetime.now(timezone(timedelta(hours=7))).year
     raw_link = str(product.get("Link_Produk", "")).strip()
     links = extract_links(raw_link)
     links_display = "\n".join(links) if links else raw_link
@@ -179,6 +180,7 @@ CONTOH GAYA, EMOJI, SPASI BARIS, & ALUR UTAS YANG DIINGINKAN (ikuti persis ritme
 
 TUGAS SEKARANG:
 Buatkan 1 utas baru yang terdiri dari **8 postingan berantai** untuk produk berikut:
+- Tahun saat ini: {current_year} (kalau menyebut tahun/periode, WAJIB pakai {current_year} atau setelahnya — JANGAN pernah pakai tahun lampau seperti 2024/2025!)
 - Nama Produk: {produk}
 - Keunggulan / Info Produk: {keunggulan}
 {extra_info}- Link Produk (wajib masuk persis di Utas ke-7 / postingan kedua terakhir):
