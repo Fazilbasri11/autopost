@@ -97,10 +97,13 @@ def ensure_links_in_post(post_text: str, links: list[str]) -> str:
     return trim_post(post_text, max_body) + f"\n\n{links_block}"
 
 
-def sanitize_topic_tag(raw_tag: str) -> str:
+def sanitize_topic_tag(raw_tag: str, max_words: int = 2) -> str:
     tag = (raw_tag or "").strip().lstrip("#")
-    tag = tag.replace("&", " dan ").replace(".", "")
-    tag = re.sub(r"\s+", " ", tag).strip()
+    tag = tag.replace("&", " ").replace(".", "")
+    words = re.sub(r"\s+", " ", tag).strip().split()
+    if max_words > 0:
+        words = words[:max_words]
+    tag = " ".join(words)
     if len(tag) > 50:
         tag = tag[:50].strip()
     return tag
@@ -210,7 +213,7 @@ Aturan ketat (WAJIB DIPATUHI):
    - Murni ajakan tanya/diskusi di kolom komentar ("tanya di komen. Gue jawab satu-satu.") + penyemangat. JANGAN taruh link di utas ke-8.
 6. JANGAN beri nomor kartu di awal postingan ("1.", "2.", "3.") dan JANGAN pakai hashtag (#).
 7. Setiap postingan MAKSIMAL 450 karakter (termasuk spasi, baris baru, emoji, dan link).
-8. Sertakan juga `"topic_tag"` untuk topik biru Threads (1-3 kata relevan, misal "CPNS 2026" atau "Tips Belajar", TANPA simbol `#`, `.`, `&`, maks 50 karakter).
+8. Sertakan juga `"topic_tag"` untuk topik biru Threads (MAKSIMAL 2 KATA yang padat & relevan, misal "CPNS 2026" atau "Tips Belajar", TANPA simbol `#`, `.`, `&`, maks 50 karakter).
 
 Kembalikan HANYA JSON valid dengan format:
 {{

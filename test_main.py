@@ -66,7 +66,7 @@ class TestAutopostLogic(unittest.TestCase):
             main.ANGLES[0],
         )
 
-        self.assertEqual(topic_tag, "CPNS 2026 dan SKD")
+        self.assertEqual(topic_tag, "CPNS 2026")
         self.assertEqual(len(posts), 8)
         for post in posts:
             self.assertLessEqual(len(post), main.MAX_THREADS_CHARS)
