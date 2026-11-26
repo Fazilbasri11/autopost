@@ -97,16 +97,26 @@ def ensure_links_in_post(post_text: str, links: list[str]) -> str:
     return trim_post(post_text, max_body) + f"\n\n{links_block}"
 
 
+def sanitize_topic_tag(raw_tag: str) -> str:
+    tag = (raw_tag or "").strip().lstrip("#")
+    tag = tag.replace("&", " dan ").replace(".", "")
+    tag = re.sub(r"\s+", " ", tag).strip()
+    if len(tag) > 50:
+        tag = tag[:50].strip()
+    return tag
+
+
 def generate_thread_posts(
     gemini_api_key: str,
     gemini_model: str,
     product: dict,
     angle: str,
-) -> list[str]:
+) -> tuple[list[str], str]:
     produk = str(product.get("Produk", "")).strip()
     keunggulan = str(product.get("Keunggulan", "")).strip()
     kekurangan = str(product.get("Kekurangan", "")).strip()
     niche = str(product.get("Niche", "") or product.get("Topik", "")).strip()
+    manual_topic = sanitize_topic_tag(str(product.get("Topic", "") or product.get("Topic_Tag", "")))
     raw_link = str(product.get("Link_Produk", "")).strip()
     links = extract_links(raw_link)
     links_display = "\n".join(links) if links else raw_link
@@ -198,9 +208,11 @@ Aturan ketat (WAJIB DIPATUHI):
    - Murni ajakan tanya/diskusi di kolom komentar ("tanya di komen. Gue jawab satu-satu.") + penyemangat. JANGAN taruh link di utas ke-8.
 6. JANGAN beri nomor kartu di awal postingan ("1.", "2.", "3.") dan JANGAN pakai hashtag (#).
 7. Setiap postingan MAKSIMAL 450 karakter (termasuk spasi, baris baru, emoji, dan link).
+8. Sertakan juga `"topic_tag"` untuk topik biru Threads (1-3 kata relevan, misal "CPNS 2026" atau "Tips Belajar", TANPA simbol `#`, `.`, `&`, maks 50 karakter).
 
 Kembalikan HANYA JSON valid dengan format:
 {{
+  "topic_tag": "CPNS 2026",
   "posts": [
     "isi utas 1 (hook 3 paragraf + emoji)",
     "isi utas 2 (fase masalah 3 bullet + emoji)",
@@ -239,6 +251,7 @@ Kembalikan HANYA JSON valid dengan format:
             for p in parsed["posts"]
             if str(p).replace("\ufffc", "").strip()
         ]
+        ai_topic = sanitize_topic_tag(str(parsed.get("topic_tag", "")))
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
         raise RuntimeError(f"Format output Gemini tidak sesuai: {data}") from exc
 
@@ -250,7 +263,8 @@ Kembalikan HANYA JSON valid dengan format:
         link_idx = -2
         posts[link_idx] = ensure_links_in_post(posts[link_idx], links)
 
-    return [trim_post(p) for p in posts]
+    topic_tag = manual_topic or ai_topic
+    return [trim_post(p) for p in posts], topic_tag
 
 
 def wait_container_ready(container_id: str, access_token: str, max_attempts: int = 10) -> None:
@@ -280,6 +294,7 @@ def create_and_publish_single(
     text: str,
     reply_to_id: str | None = None,
     image_url: str | None = None,
+    topic_tag: str | None = None,
 ) -> str:
     payload: dict[str, str] = {
         "text": text,
@@ -293,6 +308,8 @@ def create_and_publish_single(
 
     if reply_to_id:
         payload["reply_to_id"] = reply_to_id
+    if topic_tag:
+        payload["topic_tag"] = topic_tag
 
     create_resp = requests.post(
         f"{THREADS_API_BASE}/{user_id}/threads",
@@ -329,12 +346,18 @@ def publish_thread_chain(
     access_token: str,
     posts: list[str],
     image_url: str = "",
+    topic_tag: str = "",
     dry_run: bool = False,
 ) -> list[str]:
     if dry_run:
         print("=== DRY RUN MODE (tidak benar-benar memposting ke Threads) ===")
         for idx, text in enumerate(posts, start=1):
-            extra = f" [IMAGE: {image_url}]" if (idx == 1 and image_url) else ""
+            extra = ""
+            if idx == 1:
+                if topic_tag:
+                    extra += f" [TOPIC: {topic_tag}]"
+                if image_url:
+                    extra += f" [IMAGE: {image_url}]"
             print(f"\n--- Utas {idx}/{len(posts)}{extra} ({len(text)} karakter) ---\n{text}")
         return [f"dry-run-{i}" for i in range(1, len(posts) + 1)]
 
@@ -343,12 +366,14 @@ def publish_thread_chain(
 
     for idx, text in enumerate(posts, start=1):
         img = image_url if (idx == 1 and image_url) else None
+        tag = topic_tag if (idx == 1 and topic_tag) else None
         post_id = create_and_publish_single(
             user_id=user_id,
             access_token=access_token,
             text=text,
             reply_to_id=prev_id,
             image_url=img,
+            topic_tag=tag,
         )
         published_ids.append(post_id)
         prev_id = post_id
@@ -396,14 +421,17 @@ def main() -> int:
     print(f"Produk terpilih (baris {product['row_number']}): {product['Produk']}")
     print(f"Angle terpilih: {angle_label}")
 
-    posts = generate_thread_posts(gemini_api_key, gemini_model, product, angle)
+    posts, topic_tag = generate_thread_posts(gemini_api_key, gemini_model, product, angle)
     image_url = str(product.get("Image_URL", "")).strip()
+    if topic_tag:
+        print(f"Topic biru terpilih: {topic_tag}")
 
     published_ids = publish_thread_chain(
         user_id=threads_user_id,
         access_token=threads_access_token,
         posts=posts,
         image_url=image_url,
+        topic_tag=topic_tag,
         dry_run=dry_run,
     )
 

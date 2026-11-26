@@ -13,7 +13,7 @@ Sistem otomatis yang berjalan setiap **3 jam sekali** di cloud gratis (GitHub Ac
 2. Pastikan nama tab sheet di bawah adalah **`Produk`**.
 3. Isi **Baris 1 (Header)** kolom A sampai H persis seperti ini:
    `Produk` | `Keunggulan` | `Link_Produk` | `Image_URL` | `Aktif` | `Total_Post` | `Terakhir_Post` | `Catatan_Angle`
-   *(Opsional: kamu juga bisa menambahkan kolom `Niche` dan `Kekurangan` jika ingin AI lebih spesifik saat menulis bagian topik dan kekurangan jujur).*
+   *(Opsional: kamu juga bisa menambahkan kolom `Niche`, `Kekurangan`, dan `Topic` jika ingin AI lebih spesifik — kalau `Topic` dikosongkan, AI otomatis memilihkan tag topik biru Threads yang relevan).*
 4. Isi baris ke-2 dan seterusnya dengan produkmu:
    - `Link_Produk`: boleh 1 link atau beberapa link sekaligus (pisahkan dengan baris baru / spasi) kalau 1 baris berisi paket beberapa produk.
    - `Aktif`: isi `YA` kalau mau ikut dirotasi, `TIDAK` kalau mau dijeda.

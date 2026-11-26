@@ -33,6 +33,7 @@ class TestAutopostLogic(unittest.TestCase):
                             {
                                 "text": json.dumps(
                                     {
+                                        "topic_tag": "#CPNS 2026 & SKD.",
                                         "posts": [
                                             "Tips lolos tes " + ("x" * 600) + "\ufffc",
                                             "Lo lagi di fase mana?",
@@ -42,7 +43,7 @@ class TestAutopostLogic(unittest.TestCase):
                                             "Gue pakai 2 buku ini. Kekurangannya: butuh paham konsep.",
                                             "Ini link bukunya, kalau udah punya pakai aja.",
                                             "Ada pertanyaan? Tanya di komen, gue jawab satu-satu.",
-                                        ]
+                                        ],
                                     }
                                 )
                             }
@@ -53,7 +54,7 @@ class TestAutopostLogic(unittest.TestCase):
         }
         mock_post.return_value = mock_resp
 
-        posts = main.generate_thread_posts(
+        posts, topic_tag = main.generate_thread_posts(
             "fake-key",
             "gemini-2.5-flash",
             {
@@ -65,6 +66,7 @@ class TestAutopostLogic(unittest.TestCase):
             main.ANGLES[0],
         )
 
+        self.assertEqual(topic_tag, "CPNS 2026 dan SKD")
         self.assertEqual(len(posts), 8)
         for post in posts:
             self.assertLessEqual(len(post), main.MAX_THREADS_CHARS)
@@ -82,6 +84,7 @@ class TestAutopostLogic(unittest.TestCase):
             access_token="tok",
             posts=["p1", "p2", "p3"],
             image_url="https://example.com/pic.jpg",
+            topic_tag="CPNS 2026",
             dry_run=False,
         )
         self.assertEqual(ids, ["id_1", "id_2", "id_3"])
@@ -93,10 +96,12 @@ class TestAutopostLogic(unittest.TestCase):
                 "text": "p1",
                 "reply_to_id": None,
                 "image_url": "https://example.com/pic.jpg",
+                "topic_tag": "CPNS 2026",
             },
         )
         self.assertEqual(mock_pub.call_args_list[1].kwargs["reply_to_id"], "id_1")
         self.assertIsNone(mock_pub.call_args_list[1].kwargs["image_url"])
+        self.assertIsNone(mock_pub.call_args_list[1].kwargs["topic_tag"])
         self.assertEqual(mock_pub.call_args_list[2].kwargs["reply_to_id"], "id_2")
 
 
